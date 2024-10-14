@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,12 +25,7 @@ public class UserServiceImpl implements UserService {
      * @return the newly created user
      */
     @Override
-    public User addUser(UserDTO userDTO) {
-        User user = new User();
-        user.setUserId(userDTO.userId().toLowerCase());
-        user.setName(user.getName());
-        user.setEmail(userDTO.email());
-
+    public User addUser(User user) {
         return userRepository.save(user);
     }
 
@@ -55,8 +51,8 @@ public class UserServiceImpl implements UserService {
      * @return a user or else it throws an exception
      */
     @Override
-    public User getUserById(String userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not present with userId: " + userId));
+    public Optional<User> getUserById(String userId) {
+        return userRepository.findById(userId);
     }
 
 
