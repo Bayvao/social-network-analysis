@@ -1,6 +1,8 @@
 package com.social.network.analysis.service.impl;
 
 import com.social.network.analysis.entity.User;
+import com.social.network.analysis.exception.FriendshipAlreadyExistsException;
+import com.social.network.analysis.exception.UserNotFoundException;
 import com.social.network.analysis.service.FriendshipService;
 import com.social.network.analysis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +29,17 @@ public class FriendshipServiceImpl implements FriendshipService {
      */
     @Override
     public User createFriendship(String userId, String friendId) {
-        Optional<User> user = userService.getUserById(userId);
-        Optional<User> friend = userService.getUserById(userId);
+        User user = getOptionalUser(userId);
+        User friend = getOptionalUser(friendId);
 
-        if (user.isPresent() && friend.isPresent()) {
-            user.get().addFriend(friend.get());
-
-            userService.addUser(user.get());
-            userService.addUser(friend.get());
+        Optional<User> matchingFriend = user.getFriends().stream().filter(f -> f.getUserId().equals(friend.getUserId())).findFirst();
+        if (matchingFriend.isPresent()) {
+           throw new FriendshipAlreadyExistsException("Friendship already exists between userId: " + userId + " and userId: " + friendId);
         }
+
+        user.addFriend(friend);
+        userService.addUser(user);
+        userService.addUser(friend);
 
         return userService.getUserById(userId).orElse(null);
 
@@ -48,16 +52,12 @@ public class FriendshipServiceImpl implements FriendshipService {
      */
     @Override
     public User removeFriendship(String userId, String friendId) {
-        Optional<User> user = userService.getUserById(userId);
-        Optional<User> friend = userService.getUserById(userId);
+        User user = getOptionalUser(userId);
+        User friend = getOptionalUser(userId);
 
-        if (user.isPresent() && friend.isPresent()) {
-            user.get().removeFriend(friend.get());
-
-            userService.addUser(user.get());
-            userService.addUser(friend.get());
-        }
-
+        user.removeFriend(friend);
+        userService.addUser(user);
+        userService.addUser(friend);
         return userService.getUserById(userId).orElse(null);
     }
 
@@ -69,5 +69,13 @@ public class FriendshipServiceImpl implements FriendshipService {
     public Set<User> listFriends(String userId) {
         Optional<User> user = userService.getUserById(userId);
         return user.map(User::getFriends).orElse(Collections.emptySet());
+    }
+
+    private User getOptionalUser(String userId) {
+        Optional<User> userOptional = userService.getUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("User does not exist with userId: " + userId);
+        }
+        return userOptional.get();
     }
 }

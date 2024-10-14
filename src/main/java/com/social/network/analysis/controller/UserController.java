@@ -2,6 +2,8 @@ package com.social.network.analysis.controller;
 
 import com.social.network.analysis.dto.UserDTO;
 import com.social.network.analysis.entity.User;
+import com.social.network.analysis.exception.DataPersistException;
+import com.social.network.analysis.exception.UserAlreadyExistException;
 import com.social.network.analysis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +35,16 @@ public class UserController {
         user.setUserId(userDTO.userId());
         user.setName(userDTO.name());
         user.setEmail(userDTO.email());
-        User savedUser = userService.addUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        try {
+            return new ResponseEntity<>( userService.addUser(user),
+                    HttpStatus.CREATED);
+        } catch (UserAlreadyExistException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new DataPersistException();
+        }
+
+
     }
 
     /**
@@ -42,7 +53,12 @@ public class UserController {
      */
     @PostMapping("/{id}")
     public ResponseEntity<HttpStatusCode> removeUser(@PathVariable("id") String userId) {
-        userService.removeUser(userId);
+        try {
+            userService.removeUser(userId);
+        } catch (Exception ex) {
+            throw new DataPersistException();
+        }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -51,7 +67,8 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<User>> listAllUsers() {
-        List<User> users = userService.listAllUsers();
+        List<User> users = new ArrayList<>();
+        users = userService.listAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

@@ -2,6 +2,7 @@ package com.social.network.analysis.service.impl;
 
 import com.social.network.analysis.dto.UserDTO;
 import com.social.network.analysis.entity.User;
+import com.social.network.analysis.exception.UserAlreadyExistException;
 import com.social.network.analysis.repository.UserRepository;
 import com.social.network.analysis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User addUser(User user) {
+        Optional<User> existingUser = userRepository.findById(user.getUserId());
+
+        if (existingUser.isPresent()) {
+            throw new UserAlreadyExistException("User already exists with userId: " + user.getUserId());
+        }
         return userRepository.save(user);
     }
 
