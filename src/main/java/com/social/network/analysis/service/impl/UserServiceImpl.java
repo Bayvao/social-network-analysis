@@ -24,6 +24,8 @@ public class UserServiceImpl implements UserService {
     /**
      * @param userDTO
      * @return the newly created user
+     *
+     * This method saves a new user to the DB
      */
     @Override
     public User addUser(User user) {
@@ -54,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * @param userId
-     * @return a user or else it throws an exception
+     * @return a user if exists from the DB
      */
     @Override
     public Optional<User> getUserById(String userId) {

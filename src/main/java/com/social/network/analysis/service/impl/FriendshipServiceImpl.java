@@ -25,7 +25,8 @@ public class FriendshipServiceImpl implements FriendshipService {
     /**
      * @param userId
      * @param friendId
-     * @return
+     * @return User
+     * this method creates friend relation between two users given their ids
      */
     @Override
     public User createFriendship(String userId, String friendId) {
@@ -49,6 +50,7 @@ public class FriendshipServiceImpl implements FriendshipService {
      * @param userId
      * @param friendId
      * @return
+     * this method remove friendship relationship between two user given their id's
      */
     @Override
     public User removeFriendship(String userId, String friendId) {
@@ -63,7 +65,7 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     /**
      * @param userId
-     * @return
+     * @return set of friends for a user given its userId
      */
     @Override
     public Set<User> listFriends(String userId) {

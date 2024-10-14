@@ -26,7 +26,8 @@ public class NetworkAnalysisServiceImpl implements NetworkAnalysisService {
     /**
      * @param userId
      * @param friendId
-     * @return
+     * @return List of string which contains username
+     * This method returns the shortest path between two users given their ids
      */
     @Override
     public List<String> findShortestPath(String userId, String friendId) {
@@ -46,20 +47,17 @@ public class NetworkAnalysisServiceImpl implements NetworkAnalysisService {
      */
     @Override
     public Object identifyCommunities() {
-
-        Object o = userRepository.identifyCommunities();
-        return o;
-
+       return userRepository.identifyCommunities();
     }
 
     /**
      * @return
+     * the number of friends each user has
      */
     @Override
     public  List<CentralityDTO> calculateDegreeCentrality() {
 
-        List<CentralityDTO> centarilityData = userRepository.calculateDegreeCentrality().get();
+        return userRepository.calculateDegreeCentrality().get();
 
-        return centarilityData;
     }
 }
